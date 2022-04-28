@@ -1,10 +1,11 @@
 package edu.upc.dsa.services;
 
-import edu.upc.dsa.util.RandomUtils;
 import edu.upc.dsa.ProductManager;
 import edu.upc.dsa.ProductManagerImpl;
 import edu.upc.dsa.models.Order;
+import edu.upc.dsa.models.OrderTO;
 import edu.upc.dsa.models.Product;
+import edu.upc.dsa.util.RandomUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -42,21 +43,6 @@ public class ProductsService {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProductsSorted() {
-
-        List<Product> products = this.pm.ordenarlistaProductos();
-
-        GenericEntity<List<Product>> entity = new GenericEntity<List<Product>>(products) {};
-        return Response.status(201).entity(entity).build()  ;
-
-    }
-    @GET
-    @Path("/orders")
-    @ApiOperation(value = "get all products sorted", notes = "asdasd")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful", response = Product.class, responseContainer="List"),
-    })
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProdudctsSorted() {
 
         List<Product> products = this.pm.ordenarlistaProductos();
 
@@ -120,7 +106,10 @@ public class ProductsService {
 
     @Path("/orders")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response newOrder(Order order) {
+    public Response newOrder(OrderTO order) {
+        System.out.println(order.getId() + " " + order.getListap());
+        if (order.getListap()==null || order.getId()==null)  return Response.status(500).entity(order).build();
+        this.pm.addOrder(order, RandomUtils.getId());
         return Response.status(201).entity(order).build();
     }
 }

@@ -4,32 +4,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Order {
-    private List<ProdCant> ListaP = new ArrayList<ProdCant>();
-    private String ID;
+    private List<ProdCant> listap = new ArrayList<ProdCant>();
+    private String id;
 
     public Order(){}
 
-    public Order(List<ProdCant> ListaP, String ID){
-        this.ListaP = ListaP;
-        this.ID = ID;
+    public Order(List<ProdCant> listap, String id){
+        this.listap = listap;
+        this.id = id;
     }
     public void addProdCant(Product product,int quant){
-        ListaP.add(new ProdCant(product,quant));
+        listap.add(new ProdCant(product,quant));
     }
 
-    public List<ProdCant> getListaP() {
-        return ListaP;
+    public List<ProdCant> getListap() {
+        return listap;
     }
 
-    public void setListaP(List<ProdCant> listaP) {
-        ListaP = listaP;
+    public void setListap(List<ProdCant> listap) {
+        this.listap = listap;
     }
 
-    public String getID() {
-        return ID;
+    public String getId() {
+        return id;
     }
 
-    public void setUser(String ID) {
-        this.ID = ID;
+    public void setId(String id) {
+        this.id = id;
     }
 }

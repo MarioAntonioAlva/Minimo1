@@ -1,7 +1,9 @@
 package edu.upc.dsa;
 
 import edu.upc.dsa.models.Order;
+import edu.upc.dsa.models.OrderTO;
 import edu.upc.dsa.models.ProdCant;
+import edu.upc.dsa.models.ProdCantTO;
 import edu.upc.dsa.models.Product;
 
 import java.util.*;
@@ -14,11 +16,11 @@ public class ProductManagerImpl implements ProductManager {
     private static ProductManager instance;
     protected List<Product> products;
 
-    private Queue<Order> orderQueue;
+    private Queue<OrderTO> orderQueue;
     HashMap<String, User> userByID;
-    protected List<ProdCant> prodcants;
-    private List<Order> orders;
-    protected List<Order> ordersusuarios ;
+    protected List<ProdCantTO> prodcants;
+    protected List<OrderTO> ordersusuarios ;
+    protected List<OrderTO> orders ;
     final static Logger logger = Logger.getLogger(ProductManagerImpl.class);
 
     private ProductManagerImpl() {
@@ -26,6 +28,8 @@ public class ProductManagerImpl implements ProductManager {
         this.prodcants = new LinkedList<>();
         this.orderQueue = new ArrayDeque<>();
         this.userByID = new HashMap<>();
+        this.ordersusuarios = new LinkedList<>();
+        this.orders = new LinkedList<>();
     }
 
     public static ProductManager getInstance() {
@@ -65,17 +69,12 @@ public class ProductManagerImpl implements ProductManager {
         return this.products;
     }
 
-    public Order addOrder(Order o,String u){
-        o.setUser(u);
+    public OrderTO addOrder(OrderTO o,String u){
+        o.setId(u);
+        this.orders.add(o);
         orderQueue.add(o);
         logger.info("Se ha añadido un pedido");
-        orders.add(o);
         return o;
-    }
-
-    @Override
-    public void addProdCant(Product o, double u) {
-
     }
 
     @Override
@@ -89,38 +88,54 @@ public class ProductManagerImpl implements ProductManager {
     }
 
     @Override
-    public List<Order> listaOrderporUsuario(String u) {
-        for(Order o : this.orders){
-            if(o.getID()==u){
-                ordersusuarios.add(o);
-                logger.info(o.getID() + " " + o.getListaP());
+    public List<OrderTO> listaOrderporUsuario(String u) {
+        for(OrderTO o : this.orders){
+            if(o.getId()==u){
+                for(ProdCantTO prod: o.getListap()) {
+                    ordersusuarios.add(o);
+                    logger.info(o.getId() + " " + prod.getCantidad() + " " + prod.getProd());
+                }
             }
         }
+        logger.info("===================================");
         return this.ordersusuarios;
     }
 
-    public void addProdCant(ProdCant pc) {
+    public void addProdCantTO(ProdCantTO pc) {
         logger.info("new ProdCant " + pc);
 
         this.prodcants.add (pc);
-        logger.info("new ProdCant added");
+        logger.info("Added " + pc.getCantidad() + " " + pc.getProd());
     }
 
-    public void addProdCant(Product producto, int cantidad){
-        this.addProdCant(new ProdCant(producto, cantidad));
+    public void addProdCantTO(String producto, int cantidad){
+        this.addProdCantTO(new ProdCantTO(producto, cantidad));
     }
-    public List<ProdCant> ListaProdCant() {
+    public List<ProdCantTO> ListaProdCant() {
         return this.prodcants;
     }
 
 
 
     public void deliverOrder() {
-        Order o = orderQueue.poll();
-        User u = userByID.get(o.getID());
-        for (ProdCant lp: o.getListaP())
-            products.get(products.indexOf(lp.getProd())).addNumSells(lp.getCantidad());
-        logger.info("Se ha servido el pedido con ID: " + o.getID());
+        OrderTO o = orderQueue.poll();
+        User u = userByID.get(o.getId());
+        ProdCantTO prod = o.getListap().get(1);
+        Product p = null;
+        int i = 0;
+        int j = 0;
+        for (ProdCantTO lp: o.getListap()) {
+            for(Product pro: this.products){
+                if(pro.getName() == lp.getProd()){
+                    p = products.get(i);
+                    j = i;
+                }else i++;
+            }
+            this.products.get(j).addNumSells(lp.getCantidad());
+            logger.info("Se ha añadido numsells en: " + prod.getProd() + " " + prod.getCantidad() + " veces");
+            i= 0;
+        }
+        logger.info("Se ha servido el pedido con ID: " + o.getId());
     }
 
 }
